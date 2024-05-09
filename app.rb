@@ -34,36 +34,27 @@ get("/random/new") do
 end
 
 get("/random/") do
-  low = params.fetch("low").to_i
-  high = params.fetch("high").to_i
-  @result = die = rand(low..high)
-  erb(:result)
-end
-
-get("/random/new") do
-  erb(:random)
-end
-
-get("/random/") do
-  low = params.fetch("low").to_f
-  high = params.fetch("high").to_f
-  @result = die = rand(low..high)
-  erb(:result)
+  @low = params.fetch("low").to_f
+  @high = params.fetch("high").to_f
+  @result = rand(@low..@high)
+  erb(:resultsrand)
 end
 
 get("/payment/new") do
   erb(:payment)
 end
 
-get("/payment/") do
-  @years = params.fetch("years")
+get("/payment") do
+  @years = params.fetch("user_years")
   months = @years.to_f*12.0
-  @PVal = params.fetch("PV").to_f.to_fs(:currency)
-  @APRate = params.fetch("APR").to_f.to_fs(:percentage, {:precision => 4})
-  r = APRate.to_f/(100)*1.0/(12.0)
-  numerator = r*PVal.to_f
+  pv = params.fetch("user_pv").to_f
+  @PVal = pv.to_fs(:currency)
+  APR = params.fetch("user_apr").to_f
+  @APRate = APR.to_fs(:percentage, {:precision => 4})
+  r = APR/(100.0)*1.0/(12.0)
+  numerator = r*pv
   denominator = 1-(1+r)**(-months)
-  @result = (numerator/denominator).to_fs(:currency, {:precision => 4})
+  @result = (numerator/denominator).to_fs(:currency, {:precision => 2})
 
   erb(:payment_result)
 end
